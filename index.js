@@ -23,23 +23,41 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     const allmember = client.db("ng_fitness").collection("allmembar");
+   
 
+    app.get("/serialNum", async(req,res)=>{
+      const result = await allmember.find().sort({_id : -1}).limit(1).toArray();
+      
+      res.send(result);
+    })
 
-
+   
 
     app.get("/allmembar", async (req, res) => {
       const result = await allmember.find().toArray();
       res.send(result);
     });
+    app.patch("/allmembar/staus/:id", async (req, res) => {
+      const id = req.params.id;
+      const { msg } = req.body;
+      console.log(id,msg)
+      const result = await allmember.updateOne(
+        { _id: new ObjectId(id) },
+         { $set: { active: msg } }
+      );
+
+      res.send(result);
+    });
+
     app.patch("/allmembar/:id", async (req, res) => {
       const id = req.params.id;
       const payDate = req.body.date;
-      console.log(payDate)
+      console.log(payDate);
       const result = await allmember.updateOne(
-      { _id: new ObjectId(id) },
-      { $push: { payments: payDate } }
-    );
-    res.send(result)
+        { _id: new ObjectId(id) },
+        { $push: { payments: payDate } }
+      );
+      res.send(result);
     });
     app.get("/allmembar/:id", async (req, res) => {
       const id = req.params.id;
