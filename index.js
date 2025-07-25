@@ -23,27 +23,59 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     const allmember = client.db("ng_fitness").collection("allmembar");
-   
+    // const deactiveMember = client.db("ng_fitness").collection("deactiveMembar");
 
-    app.get("/serialNum", async(req,res)=>{
-      const result = await allmember.find().sort({_id : -1}).limit(1).toArray();
-      
+    // app.post("/deactive", async(req,res)=>{
+    //   const body = req.body;
+    //   const result = await deactiveMember.insertOne(body);
+    //   res.send(result);
+    // })
+    // app.get("/deactive", async(req,res)=>{
+    //   const result = await deactiveMember.find().toArray();
+    //   res.send(result);
+    // })
+
+    app.get("/serialNum", async (req, res) => {
+      console.log("GET /serialNum called");
+      const result = await allmember
+        .find()
+        .sort({ _id: -1 })
+        .limit(1)
+        .toArray();
+
       res.send(result);
-    })
-
-   
+    });
 
     app.get("/allmembar", async (req, res) => {
       const result = await allmember.find().toArray();
       res.send(result);
     });
+    // app.patch("/allmembar/staus/:id", async (req, res) => {
+    //   const id = req.params.id;
+    //   const { msg } = req.body;
+    //   console.log(id,msg)
+    //   const result = await allmember.updateOne(
+    //     { _id: new ObjectId(id) },
+    //      { $set: { active: msg } },
+    //   );
+
+    //   res.send(result);
+    // });
+
     app.patch("/allmembar/staus/:id", async (req, res) => {
       const id = req.params.id;
-      const { msg } = req.body;
-      console.log(id,msg)
+      const { msg, admiteDate } = req.body;
+
+      const updateData = { active: msg };
+
+      // Only add admiteDate if it's provided
+      if (admiteDate) {
+        updateData.admiteDate = admiteDate;
+      }
+
       const result = await allmember.updateOne(
         { _id: new ObjectId(id) },
-         { $set: { active: msg } }
+        { $set: updateData }
       );
 
       res.send(result);
