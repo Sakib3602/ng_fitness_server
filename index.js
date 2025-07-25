@@ -64,13 +64,16 @@ async function run() {
 
     app.patch("/allmembar/staus/:id", async (req, res) => {
       const id = req.params.id;
-      const { msg, admiteDate } = req.body;
+      const { msg, admiteDate, deactive } = req.body;
 
       const updateData = { active: msg };
 
       // Only add admiteDate if it's provided
       if (admiteDate) {
         updateData.admiteDate = admiteDate;
+      }
+      if (deactive) {
+        updateData.deactive = deactive;
       }
 
       const result = await allmember.updateOne(
